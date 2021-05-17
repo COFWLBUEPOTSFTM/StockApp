@@ -8,5 +8,4 @@ public interface Position {
   double getAmountInvested();
   double getCurrentInvested();
 
-  Position combinePositions(Position p);
 }
