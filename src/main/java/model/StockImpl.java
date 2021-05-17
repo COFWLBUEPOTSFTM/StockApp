@@ -13,21 +13,10 @@ public class StockImpl implements Stock {
   private final String ticker;
   private double currentPrice;
 
-  public static StockImpl AAPL, GME, MSFT;
-  public static List<StockImpl> stockList= new ArrayList<>();
+  private double numOfStocks = 0;
+  private double amountInvested = 0;
 
-  public static void createAll(){
-    try {
-      AAPL = new StockImpl("https://www.marketwatch.com/investing/stock/aapl");
-      GME = new StockImpl("https://www.marketwatch.com/investing/stock/GME");
-      MSFT = new StockImpl("https://www.marketwatch.com/investing/stock/msft");
-      stockList.add(AAPL);  stockList.add(GME);   stockList.add(MSFT);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private StockImpl(String url) throws IOException {
+  public StockImpl(String url) throws IOException {
     this.url = url;
     Document doc = Jsoup.connect(url).get();
 
@@ -72,16 +61,41 @@ public class StockImpl implements Stock {
     this.currentPrice = Double.parseDouble(doc.select("meta[name=price]").attr("content").substring(1));
   }
 
-  public static void updateAll() throws IOException {
-    for (StockImpl s : stockList){
-      s.update();
-    }
+  @Override
+  public double getNumberOfStocks() {
+    return numOfStocks;
   }
 
-  public static void printAllData() {
-    for (StockImpl s : stockList){
-      s.printData();
-    }
+  @Override
+  public double getAmountInvested() {
+    return amountInvested;
   }
 
+  @Override
+  public double getCurrentInvested() {
+    return numOfStocks * getCurrentPrice();
+  }
+
+  @Override
+  public void buyStock(double numStocks) {
+    if (numStocks < 0){
+      throw new IllegalArgumentException("Can't buy negative stocks");
+    }
+    this.numOfStocks +=numStocks;
+    this.amountInvested += numStocks * getCurrentPrice();
+  }
+
+  @Override
+  public double sellStock(double numStocks) {
+    if (numStocks < 0){
+      throw new IllegalArgumentException("Can't sell negative stocks");
+    }
+    if (numStocks > getNumberOfStocks()){
+      numStocks = getNumberOfStocks();
+    }
+    this.numOfStocks -= numStocks;
+    double profit = numStocks*getCurrentPrice();
+    this.amountInvested -= profit;
+    return profit;
+  }
 }

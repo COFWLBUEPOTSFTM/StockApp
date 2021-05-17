@@ -13,4 +13,11 @@ public interface Stock {
 
   void printData();
   void update() throws IOException;
+
+  double getNumberOfStocks();
+  double getAmountInvested();
+  double getCurrentInvested();
+
+  void buyStock(double numStocks);
+  double sellStock(double numStocks);
 }
