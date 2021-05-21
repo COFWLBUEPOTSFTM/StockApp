@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ModelImpl implements Model{
-  List<ModelObserver> modelObservers = new ArrayList<>();
+  List<ModelObserver> modelObservers;
   double profit = 0;
   List<Stock> stockList;
   int currentDisplayed = 0;
@@ -13,6 +13,7 @@ public class ModelImpl implements Model{
 
   public ModelImpl(List<Stock> stockList){
     this.stockList = stockList;
+    modelObservers = new ArrayList<>();
   }
 
   @Override
@@ -86,11 +87,7 @@ public class ModelImpl implements Model{
     List<Stock> stockCopy = new ArrayList<>();
     Collections.copy(stockCopy, stockList);
     if (displayOnlyBought){
-      for (Stock s : stockCopy){
-        if (s.getNumberOfStocks() == 0){
-          stockCopy.remove(s);
-        }
-      }
+      stockCopy.removeIf(s -> s.getNumberOfStocks() == 0);
     }
     return stockCopy;
   }

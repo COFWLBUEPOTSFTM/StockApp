@@ -4,8 +4,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class StockImpl implements Stock {
   private final String url;
@@ -41,7 +39,7 @@ public class StockImpl implements Stock {
   }
 
   @Override
-  public double getCurrentPrice() {
+  public synchronized double getCurrentPrice() {
     return currentPrice;
   }
 
@@ -55,29 +53,28 @@ public class StockImpl implements Stock {
   }
 
   @Override
-  public void update() throws IOException {
-    Document doc = Jsoup.connect(url).get();
-
+  public synchronized void update() throws IOException {
+    Document doc = Jsoup.connect(this.url).get();
     this.currentPrice = Double.parseDouble(doc.select("meta[name=price]").attr("content").substring(1));
   }
 
   @Override
-  public double getNumberOfStocks() {
+  public synchronized double getNumberOfStocks() {
     return numOfStocks;
   }
 
   @Override
-  public double getAmountInvested() {
+  public synchronized double getAmountInvested() {
     return amountInvested;
   }
 
   @Override
-  public double getCurrentInvested() {
-    return numOfStocks * getCurrentPrice();
+  public synchronized double getCurrentInvested() {
+    return getNumberOfStocks() * getCurrentPrice();
   }
 
   @Override
-  public void buyStock(double numStocks) {
+  public synchronized void buyStock(double numStocks) {
     if (numStocks < 0){
       throw new IllegalArgumentException("Can't buy negative stocks");
     }
@@ -86,7 +83,7 @@ public class StockImpl implements Stock {
   }
 
   @Override
-  public double sellStock(double numStocks) {
+  public synchronized double sellStock(double numStocks) {
     if (numStocks < 0){
       throw new IllegalArgumentException("Can't sell negative stocks");
     }
