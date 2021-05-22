@@ -85,6 +85,9 @@ public class ModelImpl implements Model{
   @Override
   public List<Stock> displayedStocks() {
     List<Stock> stockCopy = new ArrayList<>();
+    for (Stock s : stockList){
+      stockCopy.add(null);
+    }
     Collections.copy(stockCopy, stockList);
     if (displayOnlyBought){
       stockCopy.removeIf(s -> s.getNumberOfStocks() == 0);
