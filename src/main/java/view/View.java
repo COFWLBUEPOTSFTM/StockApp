@@ -6,6 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import model.Stock;
+
+import java.util.List;
 
 public class View implements FxComponent {
   private final Controller controller;
@@ -18,9 +21,7 @@ public class View implements FxComponent {
   public Parent render() {
     HBox mainLayout = new HBox();
     SelectView selectView = new SelectView(controller);
-    OwnedView ownedView = new OwnedView(controller);
     mainLayout.getChildren().add(selectView.render());
-    mainLayout.getChildren().add(ownedView.render());
     return mainLayout;
   }
 }

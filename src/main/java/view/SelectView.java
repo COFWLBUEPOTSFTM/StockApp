@@ -7,11 +7,14 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.util.Callback;
+import model.ListOfStocks;
+import model.Stock;
+
+import java.io.IOException;
 
 public class SelectView implements FxComponent{
     private final Controller controller;
@@ -21,52 +24,50 @@ public class SelectView implements FxComponent{
     }
 
     @Override
-    public Parent render() {
+    public Parent render(){
         VBox selectView = new VBox();
         selectView.setPadding(new Insets(20, 20, 20, 20));
-        ComboBox<String> comboBox = new ComboBox<>();
+        ComboBox<Stock> comboBox = new ComboBox<>();
         comboBox.setEditable(true);
 
         CheckBox checkOwned = new CheckBox("Owned");
         boolean isSelected = checkOwned.isSelected();
 
-        ObservableList<String> items = FXCollections.observableArrayList("AMC", "GME", "SNAP", "APPL");
+        comboBox.setItems(FXCollections.observableList(controller.displayedStocks()));
+        comboBox.getSelectionModel().selectFirst();
 
-        FilteredList<String> filteredItems = new FilteredList<>(items, p -> true);
-        comboBox.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-            final TextField editor = comboBox.getEditor();
-            final String selected = comboBox.getSelectionModel().getSelectedItem();
-            Platform.runLater(() -> {
-                if (selected == null || !selected.equals(editor.getText())) {
-                    filteredItems.setPredicate(item -> {
-                        if (item.toUpperCase().startsWith(newValue.toUpperCase())) {
-                            return true;
-                        } else {
-                            return false;
+           comboBox.setCellFactory(new Callback<ListView<Stock>,ListCell<Stock>>(){
+                @Override
+                public ListCell<Stock> call(ListView<Stock> l){
+                    return new ListCell<Stock>(){
+                        @Override
+                        protected void updateItem(Stock item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (item == null || empty) {
+                                setGraphic(null);
+                            } else {
+                                setText(item.getCompany());
+                            }
                         }
-                    });
+                    } ;
                 }
             });
-        });
-        comboBox.setItems(filteredItems);
 
         Text buyPrice = new Text("Buy Price: ");
         Text amount = new Text("Amount: ");
-        Text gain = new Text ("Gain: ");
+        Text profit = new Text ("Profit: "+ controller.getProfit());
 
         comboBox.setOnAction((event) -> {
-
-            int selectedIndex = comboBox.getSelectionModel().getSelectedIndex();
-            Object selectedItem = comboBox.getSelectionModel().getSelectedItem();
-            System.out.println("Selection made: [" + selectedIndex + "] " + selectedItem);
-            System.out.println("   ComboBox.getValue(): " + comboBox.getValue());
+            Stock selectedItem = comboBox.getSelectionModel().getSelectedItem();
+            buyPrice.setText("Buy Price: " + selectedItem.getCurrentPrice());
+            amount.setText("Amount: " + selectedItem.getAmountInvested());
         });
 
         selectView.getChildren().add(comboBox);
         selectView.getChildren().add(checkOwned);
         selectView.getChildren().add(buyPrice);
         selectView.getChildren().add(amount);
-        selectView.getChildren().add(gain);
+        selectView.getChildren().add(profit);
 
         return selectView;
     }
