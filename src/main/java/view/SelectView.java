@@ -2,6 +2,7 @@ package view;
 
 import controller.Controller;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -15,6 +16,7 @@ import javafx.util.StringConverter;
 import model.ListOfStocks;
 import model.Stock;
 
+import javax.swing.event.ChangeListener;
 import java.io.IOException;
 
 public class SelectView implements FxComponent{
@@ -29,12 +31,18 @@ public class SelectView implements FxComponent{
         VBox selectView = new VBox();
         selectView.setPadding(new Insets(20, 20, 20, 20));
         ComboBox<Stock> comboBox = new ComboBox<>();
-        comboBox.setEditable(true);
 
         CheckBox checkOwned = new CheckBox("Owned");
-        boolean isSelected = checkOwned.isSelected();
 
         comboBox.setItems(FXCollections.observableList(controller.displayedStocks()));
+
+        checkOwned.selectedProperty().addListener(
+                (ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) -> {
+                    comboBox.setItems(FXCollections.observableList(controller.displayedStocks()));
+                    //the list in the observable list should be the owned stock list
+                    //the one implemented now is temp
+                });
+
         comboBox.getSelectionModel().selectFirst();
 
            comboBox.setCellFactory(new Callback<ListView<Stock>,ListCell<Stock>>(){
