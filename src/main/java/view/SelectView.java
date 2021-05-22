@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import model.ListOfStocks;
 import model.Stock;
 
@@ -52,6 +53,22 @@ public class SelectView implements FxComponent{
                     } ;
                 }
             });
+
+        comboBox.setConverter(new StringConverter<Stock>() {
+            @Override
+            public String toString(Stock user) {
+                if (user == null){
+                    return null;
+                } else {
+                    return user.getCompany();
+                }
+            }
+
+            @Override
+            public Stock fromString(String companyName) {
+                return null;
+            }
+        });
 
         Text buyPrice = new Text("Buy Price: ");
         Text amount = new Text("Amount: ");
